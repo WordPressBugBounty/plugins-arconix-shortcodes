@@ -691,10 +691,15 @@ function tabs_arconix_shortcode( $atts, $content = null ) {
 
     $GLOBALS['tab_count'] = 0;
     $tabid = 0;
+    $r     = '';
+
+    if( ! isset( $GLOBALS['tabs'] ) ) {
+        $GLOBALS['tabs'] = array();
+    }
 
     do_shortcode( $content );
 
-    if( is_array( $GLOBALS['tabs'] ) ) {
+    if( is_array( $GLOBALS['tabs'] ) && ! empty( $GLOBALS['tabs'] ) ) {
         foreach( $GLOBALS['tabs'] as $tab ) {
 
             // Set up tabid based on the id defined above
@@ -709,7 +714,7 @@ function tabs_arconix_shortcode( $atts, $content = null ) {
                     break;
             }
 
-            $tabs[] = '<li data-arconix-icon="' . $tab['icon'] . '" data-arconix-color="' . $tab['color'] . '" class="arconix-tab tab-' . sanitize_html_class( $tab['title'] ) . '"><a class="" href="#tab-' . $tabid . '">' . esc_html( $tab['title'] ) . '</a></li>';
+            $tabs[] = '<li data-arconix-icon="' . esc_attr( $tab['icon'] ) . '" data-arconix-color="' . esc_attr( $tab['color'] ) . '" class="arconix-tab tab-' . sanitize_html_class( $tab['title'] ) . '"><a class="" href="#tab-' . $tabid . '">' . esc_html( $tab['title'] ) . '</a></li>';
             $panes[] = '<div class="arconix-pane pane-' . sanitize_html_class( $tab['title'] ) . '">' . remove_wpautop( $tab['content'] ) . '</div>';
         }
         $r = "\n" . '<div class="arconix-tabs-' . sanitize_html_class( $style ) . $css . '"><ul class="arconix-tabs">' . implode( "\n", $tabs ) . '</ul>' . "\n" . '<div class="arconix-panes">' . implode( "\n", $panes ) . '</div></div>' . "\n";
@@ -754,6 +759,13 @@ function tab_arconix_shortcode( $atts, $content = null ) {
             'icon_color' => ' '
         ) );
     extract( shortcode_atts( $defaults, $atts, 'arconix_tab' ) );
+
+    if ( ! isset( $GLOBALS['tab_count'] ) ) {
+        $GLOBALS['tab_count'] = 0;
+    }
+    if ( ! isset( $GLOBALS['tabs'] ) ) {
+        $GLOBALS['tabs'] = array();
+    }
 
     $x = $GLOBALS['tab_count'];
     $GLOBALS['tabs'][$x] = array( 'title' => sprintf( $title, $GLOBALS['tab_count'] ), 'content' => $content, 'icon' => $icon, 'color' => $icon_color );
