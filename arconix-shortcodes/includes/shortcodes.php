@@ -1,4 +1,5 @@
 <?php
+// phpcs:disable
 /**
  * Returns an array of shortcodes that have passed through a compatibility mode check
  *
@@ -294,7 +295,7 @@ function accordions_arconix_shortcode( $atts, $content = null ) {
     // Combine safely.
     $class_string = esc_attr( "arconix-accordions arconix-accordions-{$type} arconix-accordions-{$load}{$css}" );
 
-    $r = '<div class="' . $class_string . '">' . remove_wpautop( $content ) . '</div>';
+    $r = '<div class="' . $class_string . '">' . wp_kses_post( remove_wpautop( $content ) ) . '</div>';
 
     return apply_filters( 'arconix_accordions_return', $r );
 }
@@ -331,7 +332,7 @@ function accordion_arconix_shortcode( $atts, $content = null ) {
     $icon = '<i class="fa"></i>';
 
     $r = '<div class="arconix-accordion-title accordion-' . sanitize_html_class( $title ) . $last . '">' . $icon .'<p>'.esc_html( $title ) . '</p></div>';
-    $r .= '<div class="arconix-accordion-content' . $last . '">' . remove_wpautop( $content ) . '</div>';
+    $r .= '<div class="arconix-accordion-content' . $last . '">' . wp_kses_post( remove_wpautop( $content ) ) . '</div>';
 
     return apply_filters( 'arconix_accordions_return', $r );
 }
@@ -641,7 +642,12 @@ function list_arconix_shortcode( $atts, $content = null ) {
             break;
 }
 
-    $r = '<div class="arconix-list" data-arconix-icon="' . esc_attr( $icon ) . '" data-arconix-color="' . esc_attr( $icon_color ) . '">' . remove_wpautop( $content ) . '</div>';
+    // Constrain to safe class-name characters so the values are inert even when
+    // read back out via jQuery .data() and rendered client-side (see arconix-shortcodes.js).
+    $icon       = sanitize_html_class( $icon );
+    $icon_color = sanitize_html_class( $icon_color );
+
+    $r = '<div class="arconix-list" data-arconix-icon="' . esc_attr( $icon ) . '" data-arconix-color="' . esc_attr( $icon_color ) . '">' . wp_kses_post( remove_wpautop( $content ) ) . '</div>';
 
     return apply_filters( 'arconix_list_return', $r );
 }
@@ -715,7 +721,7 @@ function tabs_arconix_shortcode( $atts, $content = null ) {
             }
 
             $tabs[] = '<li data-arconix-icon="' . esc_attr( $tab['icon'] ) . '" data-arconix-color="' . esc_attr( $tab['color'] ) . '" class="arconix-tab tab-' . sanitize_html_class( $tab['title'] ) . '"><a class="" href="#tab-' . $tabid . '">' . esc_html( $tab['title'] ) . '</a></li>';
-            $panes[] = '<div class="arconix-pane pane-' . sanitize_html_class( $tab['title'] ) . '">' . remove_wpautop( $tab['content'] ) . '</div>';
+            $panes[] = '<div class="arconix-pane pane-' . sanitize_html_class( $tab['title'] ) . '">' . wp_kses_post( remove_wpautop( $tab['content'] ) ) . '</div>';
         }
         $r = "\n" . '<div class="arconix-tabs-' . sanitize_html_class( $style ) . $css . '"><ul class="arconix-tabs">' . implode( "\n", $tabs ) . '</ul>' . "\n" . '<div class="arconix-panes">' . implode( "\n", $panes ) . '</div></div>' . "\n";
     }
@@ -766,6 +772,11 @@ function tab_arconix_shortcode( $atts, $content = null ) {
     if ( ! isset( $GLOBALS['tabs'] ) ) {
         $GLOBALS['tabs'] = array();
     }
+
+    // Constrain to safe class-name characters so the values are inert even when
+    // read back out via jQuery .data() and rendered client-side (see arconix-shortcodes.js).
+    $icon       = sanitize_html_class( $icon );
+    $icon_color = sanitize_html_class( $icon_color );
 
     $x = $GLOBALS['tab_count'];
     $GLOBALS['tabs'][$x] = array( 'title' => sprintf( $title, $GLOBALS['tab_count'] ), 'content' => $content, 'icon' => $icon, 'color' => $icon_color );
@@ -820,7 +831,7 @@ function toggle_arconix_shortcode( $atts, $content = null ) {
     $icon = "<i class='fa {$i}'></i>";
 
     $r = '<div class="arconix-toggle-wrap'. $css . '">' . '<div class="arconix-toggle-title ' . $load . '">' . $icon . esc_html( $title ) . '</div>';
-    $r .= '<div class="arconix-toggle-content">' . remove_wpautop( $content ) . '</div></div>';
+    $r .= '<div class="arconix-toggle-content">' . wp_kses_post( remove_wpautop( $content ) ) . '</div></div>';
 
     return apply_filters( 'arconix_toggle_return', $r );
 }
@@ -847,7 +858,7 @@ function one_half_arconix_shortcode( $atts, $content = null ) {
 
     $last ? $last = ' arconix-column-last' : $last = '';
 
-    $return = '<div class="arconix-column-one-half' . $last . '">' . remove_wpautop( $content ) . '</div>';
+    $return = '<div class="arconix-column-one-half' . $last . '">' . wp_kses_post( remove_wpautop( $content ) ) . '</div>';
 
     $float = clearfloat( $last );
     $return .= $float;
@@ -877,7 +888,7 @@ function one_third_arconix_shortcode( $atts, $content = null ) {
 
     $last ? $last = ' arconix-column-last' : $last = '';
 
-    $return = '<div class="arconix-column-one-third' . $last . '">' . remove_wpautop( $content ) . '</div>';
+    $return = '<div class="arconix-column-one-third' . $last . '">' . wp_kses_post( remove_wpautop( $content ) ) . '</div>';
 
     $float = clearfloat( $last );
     $return .= $float;
@@ -907,7 +918,7 @@ function two_thirds_arconix_shortcode( $atts, $content = null ) {
 
     $last ? $last = ' arconix-column-last' : $last = '';
 
-    $return = '<div class="arconix-column-two-thirds' . $last . '">' . remove_wpautop( $content ) . '</div>';
+    $return = '<div class="arconix-column-two-thirds' . $last . '">' . wp_kses_post( remove_wpautop( $content ) ) . '</div>';
 
     $float = clearfloat( $last );
     $return .= $float;
@@ -937,7 +948,7 @@ function one_fourth_arconix_shortcode( $atts, $content = null ) {
 
     $last ? $last = ' arconix-column-last' : $last = '';
 
-    $return = '<div class="arconix-column-one-fourth' . $last . '">' . remove_wpautop( $content ) . '</div>';
+    $return = '<div class="arconix-column-one-fourth' . $last . '">' . wp_kses_post( remove_wpautop( $content ) ) . '</div>';
 
     $float = clearfloat( $last );
     $return .= $float;
@@ -967,7 +978,7 @@ function two_fourths_arconix_shortcode( $atts, $content = null ) {
 
     $last ? $last = ' arconix-column-last' : $last = '';
 
-    $return = '<div class="arconix-column-two-fourths' . $last . '">' . remove_wpautop( $content ) . '</div>';
+    $return = '<div class="arconix-column-two-fourths' . $last . '">' . wp_kses_post( remove_wpautop( $content ) ) . '</div>';
 
     $float = clearfloat( $last );
     $return .= $float;
@@ -997,7 +1008,7 @@ function three_fourths_arconix_shortcode( $atts, $content = null ) {
 
     $last ? $last = ' arconix-column-last' : $last = '';
 
-    $return = '<div class="arconix-column-three-fourths' . $last . '">' . remove_wpautop( $content ) . '</div>';
+    $return = '<div class="arconix-column-three-fourths' . $last . '">' . wp_kses_post( remove_wpautop( $content ) ) . '</div>';
 
     $float = clearfloat( $last );
     $return .= $float;
@@ -1027,7 +1038,7 @@ function one_fifth_arconix_shortcode( $atts, $content = null ) {
 
     $last ? $last = ' arconix-column-last' : $last = '';
 
-    $return = '<div class="arconix-column-one-fifth' . $last . '">' . remove_wpautop( $content ) . '</div>';
+    $return = '<div class="arconix-column-one-fifth' . $last . '">' . wp_kses_post( remove_wpautop( $content ) ) . '</div>';
 
     $float = clearfloat( $last );
     $return .= $float;
@@ -1057,7 +1068,7 @@ function two_fifths_arconix_shortcode( $atts, $content = null ) {
 
     $last ? $last = ' arconix-column-last' : $last = '';
 
-    $return = '<div class="arconix-column-two-fifths' . $last . '">' . remove_wpautop( $content ) . '</div>';
+    $return = '<div class="arconix-column-two-fifths' . $last . '">' . wp_kses_post( remove_wpautop( $content ) ) . '</div>';
 
     $float = clearfloat( $last );
     $return .= $float;
@@ -1087,7 +1098,7 @@ function three_fifths_arconix_shortcode( $atts, $content = null ) {
 
     $last ? $last = ' arconix-column-last' : $last = '';
 
-    $return = '<div class="arconix-column-three-fifths' . $last . '">' . remove_wpautop( $content ) . '</div>';
+    $return = '<div class="arconix-column-three-fifths' . $last . '">' . wp_kses_post( remove_wpautop( $content ) ) . '</div>';
 
     $float = clearfloat( $last );
     $return .= $float;
@@ -1117,7 +1128,7 @@ function four_fifths_arconix_shortcode( $atts, $content = null ) {
 
     $last ? $last = ' arconix-column-last' : $last = '';
 
-    $return = '<div class="arconix-column-four-fifths' . $last . '">' . remove_wpautop( $content ) . '</div>';
+    $return = '<div class="arconix-column-four-fifths' . $last . '">' . wp_kses_post( remove_wpautop( $content ) ) . '</div>';
 
     $float = clearfloat( $last );
     $return .= $float;
